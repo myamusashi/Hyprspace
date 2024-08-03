@@ -1,6 +1,7 @@
 #include <hyprland/src/plugins/PluginSystem.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/devices/IKeyboard.hpp>
+#include <wlr/types/wlr_touch.h>
 #include "Overview.hpp"
 #include "Globals.hpp"
 
@@ -19,7 +20,7 @@ CColor Config::workspaceActiveBorder = CColor(1, 1, 1, 0.3);
 CColor Config::workspaceInactiveBorder = CColor(1, 1, 1, 0);
 
 int Config::panelHeight = 250;
-int Config::panelBorderWidth = 2;
+double Config::panelBorderWidth = 2.0;
 int Config::workspaceMargin = 12;
 int Config::reservedArea = 0;
 int Config::workspaceBorderSize = 1;
@@ -263,12 +264,12 @@ void onKeyPress(void* thisptr, SCallbackInfo& info, std::any args) {
 }
 
 void onTouchDown(void* thisptr, SCallbackInfo& info, std::any args) {
-    const auto e = std::any_cast<wlr_touch_down_event*>(args);
+    const auto e = std::any_cast<wlr_touch_up_event*>(args);
     const auto targetMonitor = g_pCompositor->getMonitorFromName(e->touch->output_name ? e->touch->output_name : "");
     const auto widget = getWidgetForMonitor(targetMonitor);
     if (widget != nullptr && targetMonitor != nullptr)
         if (widget->isActive())
-            info.cancelled = !widget->buttonEvent(true, { targetMonitor->vecPosition.x + e->x * targetMonitor->vecSize.x, targetMonitor->vecPosition.y + e->y * targetMonitor->vecSize.y });
+            info.cancelled = !widget->buttonEvent(true, { targetMonitor->vecPosition.x + e->touch_id * targetMonitor->vecSize.x, targetMonitor->vecPosition.y + e->touch_id * targetMonitor->vecSize.y });
 }
 
 void onTouchUp(void* thisptr, SCallbackInfo& info, std::any args) {

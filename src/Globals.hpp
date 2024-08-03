@@ -23,7 +23,7 @@ namespace Config {
     extern CColor workspaceInactiveBorder;
 
     extern int panelHeight;
-    extern int panelBorderWidth;
+    extern double panelBorderWidth;
     extern int workspaceMargin;
     extern int reservedArea;
     extern int workspaceBorderSize;
