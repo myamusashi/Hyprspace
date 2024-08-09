@@ -8,7 +8,6 @@ void renderWindowStub(PHLWINDOW pWindow, CMonitor* pMonitor, PHLWORKSPACE pWorks
     const auto oFullscreen = pWindow->m_sFullscreenState;
     const auto oRealPosition = pWindow->m_vRealPosition.value();
     const auto oSize = pWindow->m_vRealSize.value();
-    // const auto oUseNearestNeighbor = pWindow->m_sAdditionalConfigData.nearestNeighbor.toUnderlying();
     const auto oUseNearestNeighbor = pWindow->m_sWindowData.nearestNeighbor.hasValue();
     const auto oPinned = pWindow->m_bPinned;
     const auto oDraggedWindow = g_pInputManager->currentlyDraggedWindow;
@@ -25,8 +24,9 @@ void renderWindowStub(PHLWINDOW pWindow, CMonitor* pMonitor, PHLWORKSPACE pWorks
     g_pHyprOpenGL->m_RenderData.renderModif.modifs.push_back({SRenderModifData::eRenderModifType::RMOD_TYPE_SCALE, curScaling});
     g_pHyprOpenGL->m_RenderData.renderModif.enabled = true;
     pWindow->m_pWorkspace = pWorkspaceOverride;
-    pWindow->m_bWantsInitialFullscreen = false; // FIXME: no windows should be in fullscreen when overview is open, reject all fullscreen requests when active
+    pWindow->m_bWantsInitialFullscreen = false; 
     pWindow->m_sWindowData.nearestNeighbor = false; // FIX: this wont do, need to scale surface texture down properly so that windows arent shown as pixelated mess
+    pWindow->m_sWindowData.tearing = false;
     pWindow->m_bIsFloating = false; // weird shit happened so hack fix
     pWindow->m_bPinned = true;
     pWindow->m_sWindowData.rounding = pWindow->rounding() * pMonitor->scale * curScaling;
@@ -105,12 +105,16 @@ void CHyprspaceWidget::draw() {
 	// Background box
     CBox widgetBox = {owner->vecPosition.x, owner->vecPosition.y + (Config::onBottom * (owner->vecTransformedSize.y - ((Config::panelHeight + Config::reservedArea) * owner->scale))) - (bottomInvert * curYOffset.value()), owner->vecTransformedSize.x, (Config::panelHeight + Config::reservedArea) * owner->scale}; //TODO: update size on monitor change
     
+    // Damage arena
+    CRegion damageRegion{g_pHyprOpenGL->m_RenderData.damage};
+
     // set widgetBox relative to current monitor for rendering panel
     widgetBox.x -= owner->vecPosition.x;
     widgetBox.y -= owner->vecPosition.y;
     
     g_pHyprOpenGL->m_RenderData.clipBox = CBox({0, 0}, owner->vecTransformedSize);
-    g_pHyprOpenGL->renderRectWithBlur(&widgetBox, Config::panelBaseColor);
+    g_pHyprOpenGL->renderRect(&widgetBox, Config::panelBaseColor);
+    // g_pHyprOpenGL->renderRectWithDamage(&widgetBox, Config::panelBaseColor, &damageRegion);
 
     // Panel Border
      if (Config::panelBorderWidth > 0) {
@@ -119,11 +123,11 @@ void CHyprspaceWidget::draw() {
         borderBox.y -= owner->vecPosition.y;
         
         g_pHyprOpenGL->renderRect(&borderBox, Config::panelBorderColor);
+        // g_pHyprOpenGL->renderRectWithDamage(&borderBox, Config::panelBorderColor, &damageRegion);
     }
 
 
 	g_pHyprRenderer->damageBox(&widgetBox);
-
     g_pHyprOpenGL->m_RenderData.clipBox = CBox();
 
     std::vector<int> workspaces;
@@ -195,7 +199,7 @@ void CHyprspaceWidget::draw() {
             if (Config::workspaceBorderSize >= 1 && Config::workspaceActiveBorder.a > 0) {
                 g_pHyprOpenGL->renderBorder(&curWorkspaceBox, CGradientValueData(Config::workspaceActiveBorder), 0, Config::workspaceBorderSize);
             }
-            g_pHyprOpenGL->renderRectWithBlur(&curWorkspaceBox, Config::workspaceActiveBackground); // cant really round it until I find a proper way to clip windows to a rounded rect
+            g_pHyprOpenGL->renderRect(&curWorkspaceBox, Config::workspaceActiveBackground);
             if (!Config::drawActiveWorkspace) {
                 curWorkspaceRectOffsetX += workspaceBoxW + (Config::workspaceMargin * owner->scale);
                 continue;
@@ -205,7 +209,7 @@ void CHyprspaceWidget::draw() {
             if (Config::workspaceBorderSize >= 1 && Config::workspaceInactiveBorder.a > 0) {
                 g_pHyprOpenGL->renderBorder(&curWorkspaceBox, CGradientValueData(Config::workspaceInactiveBorder), 0, Config::workspaceBorderSize);
             }
-            g_pHyprOpenGL->renderRectWithBlur(&curWorkspaceBox, Config::workspaceInactiveBackground);
+            g_pHyprOpenGL->renderRect(&curWorkspaceBox, Config::workspaceActiveBackground);
         }
 
         // background and bottom layers
@@ -223,12 +227,12 @@ void CHyprspaceWidget::draw() {
                 g_pHyprOpenGL->m_RenderData.clipBox = CBox();
             }
         }
-
+  
         // the mini panel to cover the awkward empty space reserved by the panel
         if (owner->activeWorkspace == ws && Config::affectStrut) {
             CBox miniPanelBox = {curWorkspaceRectOffsetX, curWorkspaceRectOffsetY, widgetBox.w * monitorSizeScaleFactor, widgetBox.h * monitorSizeScaleFactor};
             if (Config::onBottom) miniPanelBox = {curWorkspaceRectOffsetX, curWorkspaceRectOffsetY + workspaceBoxH - widgetBox.h * monitorSizeScaleFactor, widgetBox.w * monitorSizeScaleFactor, widgetBox.h * monitorSizeScaleFactor};
-            g_pHyprOpenGL->renderRectWithBlur(&miniPanelBox, CColor(0, 0, 0, 0), 0, 1.f, false);
+            g_pHyprOpenGL->renderRect(&miniPanelBox, CColor(0, 0, 0, 0));
         }
 
         if (ws != nullptr) {

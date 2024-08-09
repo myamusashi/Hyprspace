@@ -20,8 +20,8 @@ CColor Config::workspaceInactiveBackground = CColor(0, 0, 0, 0.5);
 CColor Config::workspaceActiveBorder = CColor(1, 1, 1, 0.3);
 CColor Config::workspaceInactiveBorder = CColor(1, 1, 1, 0);
 
-int Config::panelHeight = 250;
 float Config::panelBorderWidth = 2;
+int Config::panelHeight = 250;
 int Config::workspaceMargin = 12;
 int Config::reservedArea = 0;
 int Config::workspaceBorderSize = 1;
