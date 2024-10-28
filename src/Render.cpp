@@ -144,7 +144,7 @@ void CHyprspaceWidget::draw() {
         if (!ws) continue;
         // normal workspaces start from 1, special workspaces ends on -2
         if (ws->m_iID < 1) continue;
-        if (ws->m_pMonitor == ownerID) {
+        if (ws->m_pMonitor->ID == ownerID) {
             workspaces.push_back(ws->m_iID);
             if (highestID < ws->m_iID) highestID = ws->m_iID;
             if (lowestID > ws->m_iID) lowestID = ws->m_iID;
