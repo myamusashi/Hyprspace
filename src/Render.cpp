@@ -29,7 +29,7 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     pWindow->m_sWindowData.nearestNeighbor = false; // FIX: this wont do, need to scale surface texture down properly so that windows arent shown as pixelated mess
     pWindow->m_bIsFloating = false; // weird shit happened so hack fix
     pWindow->m_bPinned = true;
-    pWindow->m_sWindowData.rounding = pWindow->rounding() * pMonitor->scale * curScaling;
+    pWindow->m_sWindowData.rounding = CWindowOverridableVar<int>(pWindow->rounding() * curScaling * pMonitor->scale, eOverridePriority::PRIORITY_SET_PROP);
     g_pInputManager->currentlyDraggedWindow = pWindow; // override these and force INTERACTIVERESIZEINPROGRESS = true to trick the renderer
     g_pInputManager->dragMode = MBIND_RESIZE;
 
@@ -43,7 +43,7 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     pWindow->m_sWindowData.nearestNeighbor = oUseNearestNeighbor;
     pWindow->m_bIsFloating = oFloating;
     pWindow->m_bPinned = oPinned;
-    pWindow->m_sWindowData.rounding = oSpecialRounding;
+    pWindow->m_sWindowData.rounding.unset(eOverridePriority::PRIORITY_SET_PROP);
     g_pInputManager->currentlyDraggedWindow = oDraggedWindow;
     g_pInputManager->dragMode = oDragMode;
     g_pHyprOpenGL->m_RenderData.renderModif.enabled = oRenderModifEnable;
