@@ -9,7 +9,7 @@ commit_pins = [
 [Hyprspace]
 description = "Workspace overview"
 authors = ["KZdkm"]
-output = "Hyprspace.so"
+output = "build/libHyprspace.so"
 build = [
     "meson setup build",
     "ninja -C build"
