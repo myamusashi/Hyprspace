@@ -11,5 +11,6 @@ description = "Workspace overview"
 authors = ["KZdkm"]
 output = "Hyprspace.so"
 build = [
-    "make all"
+    "meson setup build",
+    "ninja -C build"
 ]
