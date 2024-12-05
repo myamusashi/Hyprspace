@@ -3,7 +3,7 @@
 
 class CHyprspaceWidget {
 
-    bool active = false;
+    bool    active = false;
 
     int64_t ownerID;
 
@@ -24,19 +24,18 @@ class CHyprspaceWidget {
     // for click-to-exit
     std::chrono::system_clock::time_point lastPressedTime = std::chrono::high_resolution_clock::now();
 
-    bool swiping = false;
+    bool                                  swiping = false;
     // whether if the panel is active before the current swiping event
-    bool activeBeforeSwipe = false;
-    double avgSwipeSpeed = 0.;
+    bool   activeBeforeSwipe = false;
+    double avgSwipeSpeed     = 0.;
     // number of swiping speed frames recorded
     int swipePoints = 0;
     // on second thought, this seems redundant as we could just write to curYOffset while swiping
-    double curSwipeOffset = 10.;
+    double                   curSwipeOffset = 10.;
 
     CAnimatedVariable<float> workspaceScrollOffset;
 
-public:
-
+  public:
     // for slide-in animation and swiping
     CAnimatedVariable<float> curYOffset;
 
@@ -44,12 +43,12 @@ public:
     ~CHyprspaceWidget();
 
     PHLMONITOR getOwner();
-    bool isActive();
+    bool       isActive();
 
-    void show();
-    void hide();
+    void       show();
+    void       hide();
 
-    void updateConfig();
+    void       updateConfig();
 
     // should be called active or not
     void draw();
@@ -65,5 +64,4 @@ public:
     bool beginSwipe(IPointer::SSwipeBeginEvent);
     bool updateSwipe(IPointer::SSwipeUpdateEvent);
     bool endSwipe(IPointer::SSwipeEndEvent);
-
 };

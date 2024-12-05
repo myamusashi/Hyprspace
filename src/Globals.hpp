@@ -22,40 +22,40 @@ namespace Config {
     extern CHyprColor workspaceActiveBorder;
     extern CHyprColor workspaceInactiveBorder;
 
-    extern int panelHeight;
-    extern int panelBorderWidth;
-    extern int workspaceMargin;
-    extern int reservedArea;
-    extern int workspaceBorderSize;
-    extern bool disableBlur;
-    extern bool adaptiveHeight; // TODO: implement
-    extern bool centerAligned;
-    extern bool onBottom; // TODO: implement
-    extern bool hideBackgroundLayers;
-    extern bool hideTopLayers;
-    extern bool hideOverlayLayers;
-    extern bool drawActiveWorkspace;
-    extern bool hideRealLayers;
-    extern bool affectStrut;
+    extern int        panelHeight;
+    extern int        panelBorderWidth;
+    extern int        workspaceMargin;
+    extern int        reservedArea;
+    extern int        workspaceBorderSize;
+    extern bool       disableBlur;
+    extern bool       adaptiveHeight; // TODO: implement
+    extern bool       centerAligned;
+    extern bool       onBottom; // TODO: implement
+    extern bool       hideBackgroundLayers;
+    extern bool       hideTopLayers;
+    extern bool       hideOverlayLayers;
+    extern bool       drawActiveWorkspace;
+    extern bool       hideRealLayers;
+    extern bool       affectStrut;
 
-    extern bool overrideGaps;
-    extern int gapsIn;
-    extern int gapsOut;
+    extern bool       overrideGaps;
+    extern int        gapsIn;
+    extern int        gapsOut;
 
-    extern bool autoDrag;
-    extern bool autoScroll;
-    extern bool exitOnClick;
-    extern bool switchOnDrop;
-    extern bool exitOnSwitch;
-    extern bool showNewWorkspace;
-    extern bool showEmptyWorkspace;
-    extern bool showSpecialWorkspace;
+    extern bool       autoDrag;
+    extern bool       autoScroll;
+    extern bool       exitOnClick;
+    extern bool       switchOnDrop;
+    extern bool       exitOnSwitch;
+    extern bool       showNewWorkspace;
+    extern bool       showEmptyWorkspace;
+    extern bool       showSpecialWorkspace;
 
-    extern bool disableGestures;
-    extern bool reverseSwipe;
+    extern bool       disableGestures;
+    extern bool       reverseSwipe;
 
-    extern float overrideAnimSpeed;
-    extern float dragAlpha;
+    extern float      overrideAnimSpeed;
+    extern float      dragAlpha;
 }
 
 extern int hyprsplitNumWorkspaces;
