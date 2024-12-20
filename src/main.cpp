@@ -3,6 +3,7 @@
 #include <hyprland/src/devices/IKeyboard.hpp>
 #include "Overview.hpp"
 #include "Globals.hpp"
+#include "src/SharedDefs.hpp"
 
 void*                                               pMouseKeybind;
 void*                                               pRenderWindow;
@@ -283,7 +284,7 @@ void onTouchUp(void* thisptr, SCallbackInfo& info, std::any args) {
             info.cancelled = !widget->buttonEvent(false, g_pInputManager->getMouseCoordsInternal());
 }
 
-void dispatchToggleOverview(std::string arg) {
+static SDispatchResult dispatchToggleOverview(std::string arg) {
     auto currentMonitor = g_pCompositor->getMonitorFromCursor();
     auto widget         = getWidgetForMonitor(currentMonitor);
     if (widget) {
@@ -304,12 +305,13 @@ void dispatchToggleOverview(std::string arg) {
         } else
             widget->isActive() ? widget->hide() : widget->show();
     }
+    return SDispatchResult{};
 }
 
-void dispatchOpenOverview(std::string arg) {
+static SDispatchResult dispatchOpenOverview(std::string arg) {
     if (arg.contains("all")) {
         for (auto& widget : g_overviewWidgets) {
-            if (!widget->isActive())
+            if (!widget->isActive()) 
                 widget->show();
         }
     } else {
@@ -319,9 +321,10 @@ void dispatchOpenOverview(std::string arg) {
             if (!widget->isActive())
                 widget->show();
     }
+    return SDispatchResult{};
 }
 
-void dispatchCloseOverview(std::string arg) {
+static SDispatchResult dispatchCloseOverview(std::string arg) {
     if (arg.contains("all")) {
         for (auto& widget : g_overviewWidgets) {
             if (widget->isActive())
@@ -334,6 +337,7 @@ void dispatchCloseOverview(std::string arg) {
             if (widget->isActive())
                 widget->hide();
     }
+    return SDispatchResult{};
 }
 
 void* findFunctionBySymbol(HANDLE inHandle, const std::string func, const std::string sym) {
@@ -466,9 +470,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE inHandle) {
     g_pConfigReloadHook = HyprlandAPI::registerCallbackDynamic(pHandle, "configReloaded", [&](void* thisptr, SCallbackInfo& info, std::any data) { reloadConfig(); });
     HyprlandAPI::reloadConfig();
 
-    HyprlandAPI::addDispatcher(pHandle, "overview:toggle", dispatchToggleOverview);
-    HyprlandAPI::addDispatcher(pHandle, "overview:open", dispatchOpenOverview);
-    HyprlandAPI::addDispatcher(pHandle, "overview:close", dispatchCloseOverview);
+    HyprlandAPI::addDispatcherV2(pHandle, "overview:toggle", ::dispatchToggleOverview);
+    HyprlandAPI::addDispatcherV2(pHandle, "overview:open", ::dispatchOpenOverview);
+    HyprlandAPI::addDispatcherV2(pHandle, "overview:close", ::dispatchCloseOverview);
 
     g_pRenderHook = HyprlandAPI::registerCallbackDynamic(pHandle, "render", onRender);
 
