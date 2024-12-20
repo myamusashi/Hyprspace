@@ -303,6 +303,7 @@ static SDispatchResult dispatchToggleOverview(std::string arg) {
         else
             widget->isActive() ? widget->hide() : widget->show();
     }
+    return SDispatchResult{};
 }
 
 static SDispatchResult dispatchOpenOverview(std::string arg) {
@@ -317,6 +318,7 @@ static SDispatchResult dispatchOpenOverview(std::string arg) {
         if (widget)
             if (!widget->isActive()) widget->show();
     }
+    return SDispatchResult{};
 }
 
 static SDispatchResult dispatchCloseOverview(std::string arg) {
@@ -331,6 +333,7 @@ static SDispatchResult dispatchCloseOverview(std::string arg) {
         if (widget)
             if (widget->isActive()) widget->hide();
     }
+    return SDispatchResult{};
 }
 
 void* findFunctionBySymbol(HANDLE inHandle, const std::string func, const std::string sym) {
