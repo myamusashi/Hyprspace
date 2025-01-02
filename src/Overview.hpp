@@ -1,4 +1,5 @@
 #pragma once
+#include "OverviewPassElement.hpp"
 #include <hyprland/src/Compositor.hpp>
 
 class CHyprspaceWidget {
@@ -19,7 +20,7 @@ class CHyprspaceWidget {
     std::vector<std::tuple<uint32_t, eFullscreenMode>> prevFullscreen;
 
     // for storing the layer alpha values prior to overview activation (which sets all panel to transparent when configured)
-    std::vector<std::tuple<Hyprutils::Memory::CWeakPointer<CLayerSurface>, float>> oLayerAlpha;
+    std::vector<std::tuple<PHLLSREF, float>> oLayerAlpha;
 
     // for click-to-exit
     std::chrono::system_clock::time_point lastPressedTime = std::chrono::high_resolution_clock::now();
@@ -34,7 +35,6 @@ class CHyprspaceWidget {
     double                   curSwipeOffset = 10.;
 
     CAnimatedVariable<float> workspaceScrollOffset;
-
   public:
     // for slide-in animation and swiping
     CAnimatedVariable<float> curYOffset;
