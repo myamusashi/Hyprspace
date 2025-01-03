@@ -15,6 +15,8 @@ CRenderRect::CRenderRect(const CRenderRect::SRectData& data_) : data(data_) {
 }
 
 void CRenderRect::draw(const CRegion& damage) {
+    if (data.box.w <= 0 || data.box.h <= 0) return;
+
     if (data.color.a == 1.F || !data.blur)
         g_pHyprOpenGL->renderRect(&data.box, data.color, data.round);
     else
