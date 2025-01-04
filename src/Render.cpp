@@ -1,3 +1,6 @@
+#include "Overview.hpp"
+#include "Globals.hpp"
+
 #include <hyprland/src/render/pass/RendererHintsPassElement.hpp>
 #include <hyprland/src/render/pass/RectPassElement.hpp>
 #include <hyprland/src/render/pass/BorderPassElement.hpp>
