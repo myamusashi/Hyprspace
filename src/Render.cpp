@@ -75,10 +75,10 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     const auto oPinned = pWindow->m_bPinned;
     const auto oDraggedWindow = g_pInputManager->currentlyDraggedWindow;
     const auto oDragMode = g_pInputManager->dragMode;
-    const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
+    // const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
     const auto oFloating = pWindow->m_bIsFloating;
 
-    const float curScaling = rectOverride.w / (oSize.x * pMonitor->scale);
+    const float curScaling = rectOverride.w / ( ws_box.size().x * pMonitor->scale);
 
     // using renderModif struct to override the position and scale of windows
     // this will be replaced by matrix transformations in hyprland
@@ -157,6 +157,22 @@ void CHyprspaceWidget::draw() {
 
     auto owner = getOwner();
 
+    // struct SBorderData {
+    //     CBox box;
+    //     CGradientValueData grad1, grad2;
+    //     bool hasGrad2 = false;
+    //     float lerp = 0.F, a = 1.F;
+    //     int round = 0, borderSize = 0;
+    // };
+
+    // struct SRectData {
+    //     CBox box;
+    //     CHyprColor color;
+    //     int round = 0;
+    //     bool blur = false, xray = false;
+    //     float blurA = 1.F;
+    // };
+
     if (!owner) return;
 
     timespec time;
@@ -180,7 +196,6 @@ void CHyprspaceWidget::draw() {
         renderRectWithBlur(widgetBox, Config::panelBaseColor);
     }
     else {
-        renderRect(widgetBox, Config::panelBaseColor);
     }
 
     // Panel Border
