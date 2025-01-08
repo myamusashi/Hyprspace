@@ -121,8 +121,8 @@ void onRender(void* thisptr, SCallbackInfo& info, std::any args) {
                 //widget->draw();
                 if (const auto curWindow = g_pInputManager->currentlyDraggedWindow.lock()) {
                     if (widget->isActive()) {
-                        g_oAlpha = curWindow->m_fActiveInactiveAlpha.goal();
-                        curWindow->m_fActiveInactiveAlpha.setValueAndWarp(0); // HACK: hide dragged window for the actual pass
+                        g_oAlpha = curWindow->m_fActiveInactiveAlpha->goal();
+                        curWindow->m_fActiveInactiveAlpha->setValueAndWarp(0); // HACK: hide dragged window for the actual pass
                     }
                 }
                 else g_oAlpha = -1;
@@ -140,11 +140,11 @@ void onRender(void* thisptr, SCallbackInfo& info, std::any args) {
                 widget->draw();
                 if (g_oAlpha != -1) {
                     if (const auto curWindow = g_pInputManager->currentlyDraggedWindow.lock()) {
-                        curWindow->m_fActiveInactiveAlpha.setValueAndWarp(Config::dragAlpha);
+                        curWindow->m_fActiveInactiveAlpha->setValueAndWarp(Config::dragAlpha);
                         timespec time;
                         clock_gettime(CLOCK_MONOTONIC, &time);
                         (*(tRenderWindow)pRenderWindow)(g_pHyprRenderer.get(), curWindow, widget->getOwner(), &time, true, RENDER_PASS_MAIN, false, false);
-                        curWindow->m_fActiveInactiveAlpha.setValueAndWarp(g_oAlpha);
+                        curWindow->m_fActiveInactiveAlpha->setValueAndWarp(g_oAlpha);
                     }
                 }
                 g_oAlpha = -1;
@@ -513,7 +513,4 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE inHandle) {
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderModif");
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderRect");
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderBorder");
 }

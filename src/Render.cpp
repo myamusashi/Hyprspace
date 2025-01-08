@@ -68,9 +68,9 @@ void renderLayerStub(Hyprutils::Memory::CWeakPointer<CLayerSurface> pLayer, PHLM
 
     SRenderModifData modifs {};
 
-    Vector2D oRealPosition = pLayer->realPosition.value();
-    Vector2D oSize = pLayer->realSize.value();
-    float oAlpha = pLayer->alpha.value(); // set to 1 to show hidden top layer
+    Vector2D oRealPosition = pLayer->realPosition->value();
+    Vector2D oSize = pLayer->realSize->value();
+    float oAlpha = pLayer->alpha->value(); // set to 1 to show hidden top layer
     // const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
     const auto oFadingOut = pLayer->fadingOut;
 
@@ -80,13 +80,13 @@ void renderLayerStub(Hyprutils::Memory::CWeakPointer<CLayerSurface> pLayer, PHLM
     modifs.modifs.push_back({SRenderModifData::eRenderModifType::RMOD_TYPE_SCALE, curScaling});
     g_pHyprRenderer->m_sRenderPass.add(makeShared<CRendererHintsPassElement>(CRendererHintsPassElement::SData{modifs}));
     // modifs.enabled = true;
-    pLayer->alpha.setValue(1);
+    pLayer->alpha->setValue(1);
     pLayer->fadingOut = false;
 
     (*(tRenderLayer)pRenderLayer)(g_pHyprRenderer.get(), pLayer, pMonitor, time, false);
 
     pLayer->fadingOut = oFadingOut;
-    pLayer->alpha.setValue(oAlpha);
+    pLayer->alpha->setValue(oAlpha);
     // g_pHyprOpenGL->m_RenderData.renderModif.enabled = oRenderModifEnable;
     // g_pHyprOpenGL->m_RenderData.renderModif.modifs.pop_back();
     // g_pHyprOpenGL->m_RenderData.renderModif.modifs.pop_back();
@@ -98,7 +98,7 @@ void CHyprspaceWidget::draw() {
 
     workspaceBoxes.clear();
 
-    if (!active && !curYOffset.isBeingAnimated()) return;
+    if (!active && !curYOffset->isBeingAnimated()) return;
 
     auto owner = getOwner();
 
@@ -133,7 +133,7 @@ void CHyprspaceWidget::draw() {
     if (Config::onBottom) bottomInvert = -1;
 
     // Background box
-    CBox widgetBox = {owner->vecPosition.x, owner->vecPosition.y + (Config::onBottom * (owner->vecTransformedSize.y - ((Config::panelHeight + Config::reservedArea) * owner->scale))) - (bottomInvert * curYOffset.value()), owner->vecTransformedSize.x, (Config::panelHeight + Config::reservedArea) * owner->scale}; //TODO: update size on monitor change
+    CBox widgetBox = {owner->vecPosition.x, owner->vecPosition.y + (Config::onBottom * (owner->vecTransformedSize.y - ((Config::panelHeight + Config::reservedArea) * owner->scale))) - (bottomInvert * curYOffset->value()), owner->vecTransformedSize.x, (Config::panelHeight + Config::reservedArea) * owner->scale}; //TODO: update size on monitor change
 
     // set widgetBox relative to current monitor for rendering panel
     widgetBox.x -= owner->vecPosition.x;
@@ -153,7 +153,7 @@ void CHyprspaceWidget::draw() {
     // Panel Border
     if (Config::panelBorderWidth > 0) {
         // Border box
-        CBox borderBox = {widgetBox.x, owner->vecPosition.y + (Config::onBottom * owner->vecTransformedSize.y) + (Config::panelHeight + Config::reservedArea - curYOffset.value() * owner->scale) * bottomInvert, owner->vecTransformedSize.x, Config::panelBorderWidth};
+        CBox borderBox = {widgetBox.x, owner->vecPosition.y + (Config::onBottom * owner->vecTransformedSize.y) + (Config::panelHeight + Config::reservedArea - curYOffset->value() * owner->scale) * bottomInvert, owner->vecTransformedSize.x, Config::panelBorderWidth};
         borderBox.y -= owner->vecPosition.y;
 
         // g_pHyprOpenGL->renderRect(&borderBox, Config::panelBorderColor);
@@ -162,7 +162,7 @@ void CHyprspaceWidget::draw() {
 
 
     // unscaled and relative to owner
-    CBox damageBox = {0, (Config::onBottom * (owner->vecTransformedSize.y - ((Config::panelHeight + Config::reservedArea)))) - (bottomInvert * curYOffset.value()), owner->vecTransformedSize.x, (Config::panelHeight + Config::reservedArea) * owner->scale};
+    CBox damageBox = {0, (Config::onBottom * (owner->vecTransformedSize.y - ((Config::panelHeight + Config::reservedArea)))) - (bottomInvert * curYOffset->value()), owner->vecTransformedSize.x, (Config::panelHeight + Config::reservedArea) * owner->scale};
 
     owner->addDamage(&damageBox);
 
@@ -219,11 +219,11 @@ void CHyprspaceWidget::draw() {
     double workspaceBoxW = owner->vecTransformedSize.x * monitorSizeScaleFactor;
     double workspaceBoxH = owner->vecTransformedSize.y * monitorSizeScaleFactor;
     double workspaceGroupWidth = workspaceBoxW * wsCount + (Config::workspaceMargin * owner->scale) * (wsCount - 1);
-    double curWorkspaceRectOffsetX = Config::centerAligned ? workspaceScrollOffset.value() + (widgetBox.w / 2.) - (workspaceGroupWidth / 2.) : workspaceScrollOffset.value() + Config::workspaceMargin;
-    double curWorkspaceRectOffsetY = !Config::onBottom ? (((Config::reservedArea + Config::workspaceMargin) * owner->scale) - curYOffset.value()) : (owner->vecTransformedSize.y - ((Config::reservedArea + Config::workspaceMargin) * owner->scale) - workspaceBoxH + curYOffset.value());
+    double curWorkspaceRectOffsetX = Config::centerAligned ? workspaceScrollOffset->value() + (widgetBox.w / 2.) - (workspaceGroupWidth / 2.) : workspaceScrollOffset->value() + Config::workspaceMargin;
+    double curWorkspaceRectOffsetY = !Config::onBottom ? (((Config::reservedArea + Config::workspaceMargin) * owner->scale) - curYOffset->value()) : (owner->vecTransformedSize.y - ((Config::reservedArea + Config::workspaceMargin) * owner->scale) - workspaceBoxH + curYOffset->value());
     double workspaceOverflowSize = std::max<double>(((workspaceGroupWidth - widgetBox.w) / 2) + (Config::workspaceMargin * owner->scale), 0);
 
-    workspaceScrollOffset = std::clamp<double>(workspaceScrollOffset.goal(), -workspaceOverflowSize, workspaceOverflowSize);
+    *workspaceScrollOffset = std::clamp<double>(workspaceScrollOffset->goal(), -workspaceOverflowSize, workspaceOverflowSize);
 
     if (!(workspaceBoxW > 0 && workspaceBoxH > 0)) return;
     for (auto wsID : workspaces) {
@@ -267,13 +267,13 @@ void CHyprspaceWidget::draw() {
         // background and bottom layers
         if (!Config::hideBackgroundLayers) {
             for (auto& ls : owner->m_aLayerSurfaceLayers[0]) {
-                CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition.value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize.value() * monitorSizeScaleFactor};
+                CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition->value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize->value() * monitorSizeScaleFactor};
                 g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
                 renderLayerStub(ls, owner, layerBox, &time);
                 g_pHyprOpenGL->m_RenderData.clipBox = CBox();
             }
             for (auto& ls : owner->m_aLayerSurfaceLayers[1]) {
-                CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition.value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize.value() * monitorSizeScaleFactor};
+                CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition->value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize->value() * monitorSizeScaleFactor};
                 g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
                 renderLayerStub(ls, owner, layerBox, &time);
                 g_pHyprOpenGL->m_RenderData.clipBox = CBox();
@@ -300,10 +300,10 @@ void CHyprspaceWidget::draw() {
             for (auto& w : g_pCompositor->m_vWindows) {
                 if (!w) continue;
                 if (w->m_pWorkspace == ws && !w->m_bIsFloating) {
-                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition.value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
-                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition.value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
-                    double wW = w->m_vRealSize.value().x * monitorSizeScaleFactor * owner->scale;
-                    double wH = w->m_vRealSize.value().y * monitorSizeScaleFactor * owner->scale;
+                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition->value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
+                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition->value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
+                    double wW = w->m_vRealSize->value().x * monitorSizeScaleFactor * owner->scale;
+                    double wH = w->m_vRealSize->value().y * monitorSizeScaleFactor * owner->scale;
                     if (!(wW > 0 && wH > 0)) continue;
                     CBox curWindowBox = {wX, wY, wW, wH};
                     g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
@@ -316,10 +316,10 @@ void CHyprspaceWidget::draw() {
             for (auto& w : g_pCompositor->m_vWindows) {
                 if (!w) continue;
                 if (w->m_pWorkspace == ws && w->m_bIsFloating && ws->getLastFocusedWindow() != w) {
-                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition.value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
-                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition.value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
-                    double wW = w->m_vRealSize.value().x * monitorSizeScaleFactor * owner->scale;
-                    double wH = w->m_vRealSize.value().y * monitorSizeScaleFactor * owner->scale;
+                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition->value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
+                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition->value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
+                    double wW = w->m_vRealSize->value().x * monitorSizeScaleFactor * owner->scale;
+                    double wH = w->m_vRealSize->value().y * monitorSizeScaleFactor * owner->scale;
                     if (!(wW > 0 && wH > 0)) continue;
                     CBox curWindowBox = {wX, wY, wW, wH};
                     g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
@@ -332,10 +332,10 @@ void CHyprspaceWidget::draw() {
             if (ws->getLastFocusedWindow())
                 if (ws->getLastFocusedWindow()->m_bIsFloating) {
                     const auto w = ws->getLastFocusedWindow();
-                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition.value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
-                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition.value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
-                    double wW = w->m_vRealSize.value().x * monitorSizeScaleFactor * owner->scale;
-                    double wH = w->m_vRealSize.value().y * monitorSizeScaleFactor * owner->scale;
+                    double wX = curWorkspaceRectOffsetX + ((w->m_vRealPosition->value().x - owner->vecPosition.x) * monitorSizeScaleFactor * owner->scale);
+                    double wY = curWorkspaceRectOffsetY + ((w->m_vRealPosition->value().y - owner->vecPosition.y) * monitorSizeScaleFactor * owner->scale);
+                    double wW = w->m_vRealSize->value().x * monitorSizeScaleFactor * owner->scale;
+                    double wH = w->m_vRealSize->value().y * monitorSizeScaleFactor * owner->scale;
                     if (!(wW > 0 && wH > 0)) continue;
                     CBox curWindowBox = {wX, wY, wW, wH};
                     g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
@@ -349,7 +349,7 @@ void CHyprspaceWidget::draw() {
             // this layer is hidden for real workspace when panel is displayed
             if (!Config::hideTopLayers)
                 for (auto& ls : owner->m_aLayerSurfaceLayers[2]) {
-                    CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition.value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize.value() * monitorSizeScaleFactor};
+                    CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition->value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize->value() * monitorSizeScaleFactor};
                     g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
                     renderLayerStub(ls, owner, layerBox, &time);
                     g_pHyprOpenGL->m_RenderData.clipBox = CBox();
@@ -357,7 +357,7 @@ void CHyprspaceWidget::draw() {
 
             if (!Config::hideOverlayLayers)
                 for (auto& ls : owner->m_aLayerSurfaceLayers[3]) {
-                    CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition.value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize.value() * monitorSizeScaleFactor};
+                    CBox layerBox = {curWorkspaceBox.pos() + (ls->realPosition->value() - owner->vecPosition) * monitorSizeScaleFactor, ls->realSize->value() * monitorSizeScaleFactor};
                     g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
                     renderLayerStub(ls, owner, layerBox, &time);
                     g_pHyprOpenGL->m_RenderData.clipBox = CBox();

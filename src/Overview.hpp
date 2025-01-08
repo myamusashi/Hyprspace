@@ -8,8 +8,8 @@ class CHyprspaceWidget {
     int64_t ownerID;
 
     // animation override stuff
-    SAnimationPropertyConfig curAnimationConfig;
-    SAnimationPropertyConfig curAnimation;
+    Hyprutils::Memory::CWeakPointer<Hyprutils::Animation::SAnimationPropertyConfig> curAnimationConfig;
+    Hyprutils::Memory::CWeakPointer<Hyprutils::Animation::SAnimationPropertyConfig> curAnimation;
 
     // for checking mouse hover for workspace drag and move
     // modified on draw call, accessed on mouse click and release
@@ -19,7 +19,7 @@ class CHyprspaceWidget {
     std::vector<std::tuple<uint32_t, eFullscreenMode>> prevFullscreen;
 
     // for storing the layer alpha values prior to overview activation (which sets all panel to transparent when configured)
-    std::vector<std::tuple<PHLLSREF, float>> oLayerAlpha;
+    std::vector<std::tuple<Hyprutils::Memory::CWeakPointer<CLayerSurface>, float>> oLayerAlpha;
 
     // for click-to-exit
     std::chrono::system_clock::time_point lastPressedTime = std::chrono::high_resolution_clock::now();
@@ -33,12 +33,12 @@ class CHyprspaceWidget {
     // on second thought, this seems redundant as we could just write to curYOffset while swiping
     double curSwipeOffset = 10.;
 
-    CAnimatedVariable<float> workspaceScrollOffset;
+    PHLANIMVAR<float> workspaceScrollOffset;
 
 public:
 
     // for slide-in animation and swiping
-    CAnimatedVariable<float> curYOffset;
+    PHLANIMVAR<float> curYOffset;
 
     CHyprspaceWidget(uint64_t);
     ~CHyprspaceWidget();
