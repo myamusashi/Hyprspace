@@ -515,7 +515,4 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE inHandle) {
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderModif");
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderRect");
-    g_pHyprRenderer->m_sRenderPass.removeAllOfType("CRenderBorder");
 }

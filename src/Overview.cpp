@@ -1,23 +1,25 @@
 #include "Overview.hpp"
 #include "Globals.hpp"
 
+
 CHyprspaceWidget::CHyprspaceWidget(uint64_t inOwnerID) {
     ownerID = inOwnerID;
 
-    curAnimationConfig = *g_pConfigManager->getAnimationPropertyConfig("windows");
+    curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
 
     // the fuck is pValues???
     curAnimation = *curAnimationConfig.pValues.lock();
     *curAnimationConfig.pValues.lock() = curAnimation;
 
     if (Config::overrideAnimSpeed > 0)
-        curAnimation.internalSpeed = Config::overrideAnimSpeed;
+        curAnimation->internalSpeed = Config::overrideAnimSpeed;
 
     g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
     g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
     curYOffset->setValueAndWarp(Config::panelHeight);
     workspaceScrollOffset->setValueAndWarp(0);
 }
+
 
 // TODO: implement deconstructor and delete widget on monitor unplug
 CHyprspaceWidget::~CHyprspaceWidget() {}
@@ -73,6 +75,7 @@ void CHyprspaceWidget::show() {
     }
 
     updateLayout();
+    g_pHyprRenderer->damageMonitor(owner);
     g_pCompositor->scheduleFrameForMonitor(owner);
 }
 
@@ -124,8 +127,22 @@ void CHyprspaceWidget::hide() {
     g_pCompositor->scheduleFrameForMonitor(owner);
 }
 
-void CHyprspaceWidget::updateConfig() {
-    curAnimationConfig = *g_pConfigManager->getAnimationPropertyConfig("windows");
+    //
+    // curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
+    //
+    // // the fuck is pValues???
+    // curAnimation = curAnimationConfig->pValues;
+    // curAnimationConfig->pValues = curAnimation;
+    //
+    // if (Config::overrideAnimSpeed > 0)
+    //     curAnimation->internalSpeed = Config::overrideAnimSpeed;
+    //
+    // g_pAnimationManager->createAnimation(0.F, curYOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
+    // // curYOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
+    // g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
+    // // workspaceScrollOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
+    // curYOffset->setValueAndWarp(Config::panelHeight);
+    // workspaceScrollOffset->setValueAndWarp(0);
 
     // the fuck is pValues???
     curAnimation = *curAnimationConfig.pValues.lock();
