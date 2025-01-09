@@ -1,5 +1,6 @@
 #pragma once
 #include <hyprland/src/Compositor.hpp>
+#include <hyprutils/animation/AnimationConfig.hpp>
 
 class CHyprspaceWidget {
 
@@ -8,8 +9,8 @@ class CHyprspaceWidget {
     int64_t ownerID;
 
     // animation override stuff
-    Hyprutils::Memory::CWeakPointer<Hyprutils::Animation::SAnimationPropertyConfig> curAnimationConfig;
-    Hyprutils::Memory::CWeakPointer<Hyprutils::Animation::SAnimationPropertyConfig> curAnimation;
+    static SP<Hyprutils::Animation::SAnimationPropertyConfig> curAnimationConfig;
+    static WP<Hyprutils::Animation::SAnimationPropertyConfig> curAnimation;
 
     // for checking mouse hover for workspace drag and move
     // modified on draw call, accessed on mouse click and release

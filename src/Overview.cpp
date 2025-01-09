@@ -14,10 +14,8 @@ CHyprspaceWidget::CHyprspaceWidget(uint64_t inOwnerID) {
     if (Config::overrideAnimSpeed > 0)
         curAnimation->internalSpeed = Config::overrideAnimSpeed;
 
-    g_pAnimationManager->createAnimation(0.F, curYOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // curYOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
-    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // workspaceScrollOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
     curYOffset->setValueAndWarp(Config::panelHeight);
     workspaceScrollOffset->setValueAndWarp(0);
 }
@@ -129,23 +127,6 @@ void CHyprspaceWidget::hide() {
     g_pCompositor->scheduleFrameForMonitor(owner);
 }
 
-    //
-    // curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
-    //
-    // // the fuck is pValues???
-    // curAnimation = curAnimationConfig->pValues;
-    // curAnimationConfig->pValues = curAnimation;
-    //
-    // if (Config::overrideAnimSpeed > 0)
-    //     curAnimation->internalSpeed = Config::overrideAnimSpeed;
-    //
-    // g_pAnimationManager->createAnimation(0.F, curYOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // // curYOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
-    // g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // // workspaceScrollOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
-    // curYOffset->setValueAndWarp(Config::panelHeight);
-    // workspaceScrollOffset->setValueAndWarp(0);
-
 void CHyprspaceWidget::updateConfig() {
     curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
 
@@ -155,10 +136,10 @@ void CHyprspaceWidget::updateConfig() {
     if (Config::overrideAnimSpeed > 0)
         curAnimation->internalSpeed = Config::overrideAnimSpeed;
     
-    g_pAnimationManager->createAnimation(0.F, curYOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // curYOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
-    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, g_pConfigManager->getAnimationPropertyConfig("windows"), AVARDAMAGE_ENTIRE);
-    // workspaceScrollOffset->create(&curAnimationConfig, AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
+    curYOffset->setValueAndWarp(Config::panelHeight);
+    workspaceScrollOffset->setValueAndWarp(0);
 }
 
 bool CHyprspaceWidget::isActive() {
