@@ -5,17 +5,17 @@
 CHyprspaceWidget::CHyprspaceWidget(uint64_t inOwnerID) {
     ownerID = inOwnerID;
 
-    curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
+    curAnimationConfig = *g_pConfigManager->getAnimationPropertyConfig("windows");
 
     // the fuck is pValues???
-    curAnimation = curAnimationConfig->pValues;
-    curAnimationConfig->pValues = curAnimation;
+    curAnimation = *curAnimationConfig.pValues.lock();
+    *curAnimationConfig.pValues.lock() = curAnimation;
 
     if (Config::overrideAnimSpeed > 0)
-        curAnimation->internalSpeed = Config::overrideAnimSpeed;
+        curAnimation.internalSpeed = Config::overrideAnimSpeed;
 
-    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
-    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
     curYOffset->setValueAndWarp(Config::panelHeight);
     workspaceScrollOffset->setValueAndWarp(0);
 }
@@ -54,13 +54,13 @@ void CHyprspaceWidget::show() {
     if (oLayerAlpha.empty() && Config::hideRealLayers) {
         for (auto& ls : owner->m_aLayerSurfaceLayers[2]) {
             //ls->startAnimation(false);
-            oLayerAlpha.emplace_back(std::make_tuple(ls, ls->alpha->goal()));
+            oLayerAlpha.emplace_back(std::make_tuple(ls.lock(), ls->alpha->goal()));
             *ls->alpha = 0.f;
             ls->fadingOut = true;
         }
         for (auto& ls : owner->m_aLayerSurfaceLayers[3]) {
             //ls->startAnimation(false);
-            oLayerAlpha.emplace_back(std::make_tuple(ls, ls->alpha->goal()));
+            oLayerAlpha.emplace_back(std::make_tuple(ls.lock(), ls->alpha->goal()));
             *ls->alpha = 0.f;
             ls->fadingOut = true;
         }
@@ -128,16 +128,16 @@ void CHyprspaceWidget::hide() {
 }
 
 void CHyprspaceWidget::updateConfig() {
-    curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
+    curAnimationConfig = *g_pConfigManager->getAnimationPropertyConfig("windows");
 
-    curAnimation->pValues = curAnimationConfig->pValues;
-    curAnimationConfig->pValues = curAnimation;
+    curAnimation = *curAnimationConfig.pValues.lock();
+    *curAnimationConfig.pValues.lock() = curAnimation;
 
     if (Config::overrideAnimSpeed > 0)
-        curAnimation->internalSpeed = Config::overrideAnimSpeed;
-    
-    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
-    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig, AVARDAMAGE_ENTIRE);
+        curAnimation.internalSpeed = Config::overrideAnimSpeed;
+
+    g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
+    g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
     curYOffset->setValueAndWarp(Config::panelHeight);
     workspaceScrollOffset->setValueAndWarp(0);
 }
