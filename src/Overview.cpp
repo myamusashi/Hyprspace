@@ -5,14 +5,14 @@
 CHyprspaceWidget::CHyprspaceWidget(uint64_t inOwnerID) {
     ownerID = inOwnerID;
 
-    curAnimationConfig = g_pConfigManager->getAnimationPropertyConfig("windows");
+    curAnimationConfig = *g_pConfigManager->getAnimationPropertyConfig("windows");
 
     // the fuck is pValues???
     curAnimation = *curAnimationConfig.pValues.lock();
     *curAnimationConfig.pValues.lock() = curAnimation;
 
     if (Config::overrideAnimSpeed > 0)
-        curAnimation->internalSpeed = Config::overrideAnimSpeed;
+        curAnimation.internalSpeed = Config::overrideAnimSpeed;
 
     g_pAnimationManager->createAnimation(0.F, curYOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
     g_pAnimationManager->createAnimation(0.F, workspaceScrollOffset, curAnimationConfig.pValues.lock(), AVARDAMAGE_ENTIRE);
