@@ -1,8 +1,11 @@
 #include <hyprland/src/plugins/PluginSystem.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/devices/IKeyboard.hpp>
+#include <src/managers/input/InputManager.hpp>
+#include <src/render/OpenGL.hpp>
 #include "Overview.hpp"
 #include "Globals.hpp"
+#include "src/render/Renderer.hpp"
 
 void* pMouseKeybind;
 void* pRenderWindow;
