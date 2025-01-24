@@ -1,6 +1,8 @@
 #pragma once
 #include <hyprland/src/Compositor.hpp>
 #include <hyprutils/animation/AnimationConfig.hpp>
+#include <hyprland/src/managers/AnimationManager.hpp>
+#include <hyprland/src/render/Renderer.hpp>
 
 class CHyprspaceWidget {
 
