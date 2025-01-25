@@ -69,8 +69,9 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
 
     const auto oWorkspace = pWindow->m_pWorkspace;
     const auto oFullscreen = pWindow->m_sFullscreenState;
-    const auto oRealPosition = pWindow->m_vRealPosition->value();
-    const auto oSize = pWindow->m_vRealSize->value();
+    const auto ws_box = pWindow->getFullWindowBoundingBox();
+    // const auto oRealPosition = pWindow->m_vRealPosition.value();
+    // const auto oSize = pWindow->m_vRealSize.value();
     const auto oUseNearestNeighbor = pWindow->m_sWindowData.nearestNeighbor;
     const auto oPinned = pWindow->m_bPinned;
     const auto oDraggedWindow = g_pInputManager->currentlyDraggedWindow;
@@ -78,7 +79,7 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     // const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
     const auto oFloating = pWindow->m_bIsFloating;
 
-    const float curScaling = rectOverride.w / ( oSize.x * pMonitor->scale);
+    const float curScaling = rectOverride.w / ( ws_box.size().x * pMonitor->scale);
 
     // using renderModif struct to override the position and scale of windows
     // this will be replaced by matrix transformations in hyprland
