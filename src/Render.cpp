@@ -78,7 +78,7 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     // const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
     const auto oFloating = pWindow->m_bIsFloating;
 
-    const float curScaling = rectOverride.w / ( ws_box.size().x * pMonitor->scale);
+    const float curScaling = rectOverride.w / ( oSize.x * pMonitor->scale);
 
     // using renderModif struct to override the position and scale of windows
     // this will be replaced by matrix transformations in hyprland
