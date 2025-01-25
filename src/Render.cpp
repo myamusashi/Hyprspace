@@ -1,5 +1,6 @@
 #include "Overview.hpp"
 #include "Globals.hpp"
+#include "src/render/Renderer.hpp"
 
 #include <hyprland/src/render/pass/RendererHintsPassElement.hpp>
 #include <hyprland/src/render/pass/RectPassElement.hpp>
@@ -102,21 +103,8 @@ void CHyprspaceWidget::draw() {
 
     auto owner = getOwner();
 
-    // struct SBorderData {
-    //     CBox box;
-    //     CGradientValueData grad1, grad2;
-    //     bool hasGrad2 = false;
-    //     float lerp = 0.F, a = 1.F;
-    //     int round = 0, borderSize = 0;
-    // };
-
-    // struct SRectData {
-    //     CBox box;
-    //     CHyprColor color;
-    //     int round = 0;
-    //     bool blur = false, xray = false;
-    //     float blurA = 1.F;
-    // };
+    auto RectData = CRectPassElement::SRectData{};
+    auto BorderData = CBorderPassElement::SBorderData{};
 
     if (!owner) return;
 
@@ -127,7 +115,7 @@ void CHyprspaceWidget::draw() {
 
     g_pHyprOpenGL->m_RenderData.pCurrentMonData->blurFBShouldRender = true;
     //g_pHyprOpenGL->markBlurDirtyForMonitor(owner);
-    g_pHyprOpenGL->preRender(owner);
+    // g_pHyprOpenGL->preRender(owner);
 
     int bottomInvert = 1;
     if (Config::onBottom) bottomInvert = -1;
@@ -142,12 +130,18 @@ void CHyprspaceWidget::draw() {
     g_pHyprOpenGL->m_RenderData.clipBox = CBox({0, 0}, owner->vecTransformedSize);
 
     if (!Config::disableBlur) {
-        /* g_pHyprOpenGL->renderRectWithBlur(&widgetBox, Config::panelBaseColor); */
-        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = widgetBox, .color = Config::panelBaseColor, .blur = true, .blurA = 3.F}));
+        RectData.box = widgetBox;
+        RectData.color = Config::panelBaseColor;
+        RectData.round = 0;
+        RectData.blur = true;
+        RectData.blurA = 3.F;
+        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
     }
     else {
-        // g_pHyprOpenGL->renderRect(&widgetBox, Config::panelBaseColor);
-        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = widgetBox, .color = Config::panelBaseColor}));
+        RectData.box = widgetBox;
+        RectData.color = Config::panelBaseColor;
+        RectData.round = 0;
+        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
     }
 
     // Panel Border
@@ -157,7 +151,10 @@ void CHyprspaceWidget::draw() {
         borderBox.y -= owner->vecPosition.y;
 
         // g_pHyprOpenGL->renderRect(&borderBox, Config::panelBorderColor);
-        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = borderBox, .color = Config::panelBorderColor}));
+        RectData.box = borderBox;
+        RectData.color = Config::panelBorderColor;
+        RectData.round = 0;
+        g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
     }
 
 
@@ -233,16 +230,27 @@ void CHyprspaceWidget::draw() {
         // workspace background rect (NOT background layer) and border
         if (ws == owner->activeWorkspace) {
             if (Config::workspaceBorderSize >= 1 && Config::workspaceActiveBorder.a > 0) {
-                // g_pHyprOpenGL->renderBorder(&curWorkspaceBox, CGradientValueData(Config::workspaceActiveBorder), 0, Config::workspaceBorderSize);
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CBorderPassElement>(CBorderPassElement::SBorderData{.box = curWorkspaceBox, .grad1 = Config::workspaceActiveBorder, .grad2 = Config::workspaceActiveBorder, .round = 0, .borderSize = Config::workspaceBorderSize}));
+                BorderData.box = curWorkspaceBox;
+                BorderData.grad1 = Config::workspaceActiveBorder;
+                BorderData.grad2 = Config::workspaceActiveBorder;
+                BorderData.hasGrad2 = true;
+                BorderData.round = 0;
+                BorderData.borderSize = Config::workspaceBorderSize;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CBorderPassElement>(BorderData));
             }
             if (!Config::disableBlur) {
-                // g_pHyprOpenGL->renderRectWithBlur(&curWorkspaceBox, Config::workspaceActiveBackground); // cant really round it until I find a proper way to clip windows to a rounded rect
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = curWorkspaceBox, .color = Config::workspaceActiveBackground, .blur = true, .blurA = 3.F}));
+                RectData.box = curWorkspaceBox;
+                RectData.color = Config::workspaceActiveBackground;
+                RectData.round = 0;
+                RectData.blur = true;
+                RectData.blurA = 3.F;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
             else {
-                // g_pHyprOpenGL->renderRect(&curWorkspaceBox, Config::workspaceActiveBackground);
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = curWorkspaceBox, .color = Config::workspaceActiveBackground}));
+                RectData.box = curWorkspaceBox;
+                RectData.color = Config::workspaceActiveBackground;
+                RectData.round = 0;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
             if (!Config::drawActiveWorkspace) {
                 curWorkspaceRectOffsetX += workspaceBoxW + (Config::workspaceMargin * owner->scale);
@@ -251,16 +259,27 @@ void CHyprspaceWidget::draw() {
         }
         else {
             if (Config::workspaceBorderSize >= 1 && Config::workspaceInactiveBorder.a > 0) {
-                /* g_pHyprOpenGL->renderBorder(&curWorkspaceBox, CGradientValueData(Config::workspaceInactiveBorder), 0, Config::workspaceBorderSize); */
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CBorderPassElement>(CBorderPassElement::SBorderData{.box = curWorkspaceBox, .grad1 = Config::workspaceInactiveBorder, .grad2 = Config::workspaceInactiveBorder, .round = 0, .borderSize = Config::workspaceBorderSize}));
+                BorderData.box = curWorkspaceBox;
+                BorderData.grad1 = Config::workspaceInactiveBorder;
+                BorderData.grad2 = Config::workspaceInactiveBorder;
+                BorderData.hasGrad2 = true;
+                BorderData.round = 0;
+                BorderData.borderSize = Config::workspaceBorderSize;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CBorderPassElement>(BorderData));
             }
             if (!Config::disableBlur) {
-                // g_pHyprOpenGL->renderRectWithBlur(&curWorkspaceBox, Config::workspaceInactiveBackground);
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = curWorkspaceBox, .color = Config::workspaceInactiveBorder, .blur = true, .blurA = 3.F}));
+                RectData.box = curWorkspaceBox;
+                RectData.color = Config::workspaceInactiveBorder;
+                RectData.round = 0;
+                RectData.blur = true;
+                RectData.blurA = 3.F;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
             else {
-                // g_pHyprOpenGL->renderRect(&curWorkspaceBox, Config::workspaceInactiveBackground);
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = curWorkspaceBox, .color = Config::workspaceInactiveBorder}));
+                RectData.box = curWorkspaceBox;
+                RectData.color = Config::workspaceInactiveBorder;
+                RectData.round = 0;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
         }
 
@@ -286,11 +305,18 @@ void CHyprspaceWidget::draw() {
             if (Config::onBottom) miniPanelBox = {curWorkspaceRectOffsetX, curWorkspaceRectOffsetY + workspaceBoxH - widgetBox.h * monitorSizeScaleFactor, widgetBox.w * monitorSizeScaleFactor, widgetBox.h * monitorSizeScaleFactor};
 
             if (!Config::disableBlur) {
-                // g_pHyprOpenGL->renderRectWithBlur(&miniPanelBox, CHyprColor(0, 0, 0, 0), 0, 1.f, false);
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = miniPanelBox, .color = CHyprColor(0, 0, 0, 0), .round = 0, .xray = false, .blurA = 3.F}));
+                RectData.box = miniPanelBox;
+                RectData.color = CHyprColor(0, 0, 0, 0);
+                RectData.round = 0;
+                RectData.blur = true;
+                RectData.blurA = 3.F;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
             else {
-                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(CRectPassElement::SRectData{.box = miniPanelBox, .color = CHyprColor(0, 0, 0, 0), .round = 0}));
+                RectData.box = miniPanelBox;
+                RectData.color = CHyprColor(0, 0, 0, 0);
+                RectData.round = 0;
+                g_pHyprRenderer->m_sRenderPass.add(makeShared<CRectPassElement>(RectData));
             }
 
         }
