@@ -115,7 +115,7 @@ void CHyprspaceWidget::draw() {
 
     g_pHyprOpenGL->m_RenderData.pCurrentMonData->blurFBShouldRender = true;
     //g_pHyprOpenGL->markBlurDirtyForMonitor(owner);
-    g_pHyprOpenGL->preRender(owner);
+    // g_pHyprOpenGL->preRender(owner);
 
     int bottomInvert = 1;
     if (Config::onBottom) bottomInvert = -1;
