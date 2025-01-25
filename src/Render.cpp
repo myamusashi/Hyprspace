@@ -157,21 +157,8 @@ void CHyprspaceWidget::draw() {
 
     auto owner = getOwner();
 
-    // struct SBorderData {
-    //     CBox box;
-    //     CGradientValueData grad1, grad2;
-    //     bool hasGrad2 = false;
-    //     float lerp = 0.F, a = 1.F;
-    //     int round = 0, borderSize = 0;
-    // };
-
-    // struct SRectData {
-    //     CBox box;
-    //     CHyprColor color;
-    //     int round = 0;
-    //     bool blur = false, xray = false;
-    //     float blurA = 1.F;
-    // };
+    auto RectData = CRectPassElement::SRectData{};
+    auto BorderData = CBorderPassElement::SBorderData{};
 
     if (!owner) return;
 
@@ -371,11 +358,6 @@ void CHyprspaceWidget::draw() {
                     double wH = w->m_vRealSize->value().y * monitorSizeScaleFactor * owner->scale;
                     if (!(wW > 0 && wH > 0)) continue;
                     CBox curWindowBox = {wX, wY, wW, wH};
-                    g_pHyprOpenGL->m_RenderData.clipBox = curWorkspaceBox;
-                    //g_pHyprOpenGL->renderRectWithBlur(&curWindowBox, CHyprColor(0, 0, 0, 0));
-                    renderWindowStub(w, owner, owner->activeWorkspace, curWindowBox, &time);
-                    g_pHyprOpenGL->m_RenderData.clipBox = CBox();
-                }
             }
             // draw last focused floating window on top
             if (ws->getLastFocusedWindow())
