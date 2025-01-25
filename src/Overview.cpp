@@ -58,7 +58,7 @@ void CHyprspaceWidget::show() {
             *ls->alpha = 0.f;
             ls->fadingOut = true;
         }
-        for (auto& ls : owner->m_aLayerSurfaceLayers[3]) {
+        for (auto& ls : owner->m_aLayerSurfaceLayers[4]) {
             //ls->startAnimation(false);
             oLayerAlpha.emplace_back(std::make_tuple(ls.lock(), ls->alpha->goal()));
             *ls->alpha = 0.f;
@@ -94,7 +94,7 @@ void CHyprspaceWidget::hide() {
             //ls->startAnimation(true);
         }
     }
-    for (auto& ls : owner->m_aLayerSurfaceLayers[3]) {
+    for (auto& ls : owner->m_aLayerSurfaceLayers[4]) {
         if (!ls->readyToDelete && ls->mapped && ls->fadingOut) {
             auto oAlpha = std::find_if(oLayerAlpha.begin(), oLayerAlpha.end(), [&] (const auto& tuple) {return std::get<0>(tuple) == ls;});
             if (oAlpha != oLayerAlpha.end()) {
