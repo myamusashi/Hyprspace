@@ -15,8 +15,9 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
 
     const auto oWorkspace = pWindow->m_pWorkspace;
     const auto oFullscreen = pWindow->m_sFullscreenState;
-    const auto oRealPosition = pWindow->m_vRealPosition->value();
-    const auto oSize = pWindow->m_vRealSize->value();
+    const auto ws_box = pWindow->getFullWindowBoundingBox();
+    // const auto oRealPosition = pWindow->m_vRealPosition.value();
+    // const auto oSize = pWindow->m_vRealSize.value();
     const auto oUseNearestNeighbor = pWindow->m_sWindowData.nearestNeighbor;
     const auto oPinned = pWindow->m_bPinned;
     const auto oDraggedWindow = g_pInputManager->currentlyDraggedWindow;
@@ -24,13 +25,14 @@ void renderWindowStub(PHLWINDOW pWindow, PHLMONITOR pMonitor, PHLWORKSPACE pWork
     // const auto oRenderModifEnable = g_pHyprOpenGL->m_RenderData.renderModif.enabled;
     const auto oFloating = pWindow->m_bIsFloating;
 
-    const float curScaling = rectOverride.w / ( oSize.x * pMonitor->scale);
+    const float curScaling = rectOverride.w / ( ws_box.size().x * pMonitor->scale);
 
     // using renderModif struct to override the position and scale of windows
     // this will be replaced by matrix transformations in hyprland
-    modifs.modifs.push_back({SRenderModifData::eRenderModifType::RMOD_TYPE_TRANSLATE, (pMonitor->vecPosition * pMonitor->scale) + (rectOverride.pos() / curScaling) - (oRealPosition * pMonitor->scale)});
+    modifs.modifs.push_back({SRenderModifData::eRenderModifType::RMOD_TYPE_TRANSLATE, (pMonitor->vecPosition * pMonitor->scale) + (rectOverride.pos() / curScaling) - (ws_box.pos().round() * pMonitor->scale)});
     modifs.modifs.push_back({SRenderModifData::eRenderModifType::RMOD_TYPE_SCALE, curScaling});
-    g_pHyprRenderer->m_sRenderPass.add(makeShared<CRendererHintsPassElement>(CRendererHintsPassElement::SData{modifs}));    // modifs.enabled = true;
+    g_pHyprRenderer->m_sRenderPass.add(makeShared<CRendererHintsPassElement>(CRendererHintsPassElement::SData{modifs}));
+    // modifs.enabled = true;
     pWindow->m_pWorkspace = pWorkspaceOverride;
     pWindow->m_sFullscreenState = SFullscreenState{FSMODE_NONE}; // FIXME: still do nothing, fullscreen requests not reject when overview active
     pWindow->m_sWindowData.nearestNeighbor = false; // FIX: this wont do, need to scale surface texture down properly so that windows arent shown as pixelated mess
